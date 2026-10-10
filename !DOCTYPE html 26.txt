@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок китайского: 在商店买东西 (90 минут)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f4f7fb; color: #223; }
+  header { background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fff; padding: 22px 20px; text-align: center; }
+  header h1 { font-size: 26px; margin-bottom: 6px; }
+  header p { opacity: .92; }
+  .timer-bar { position: sticky; top: 0; z-index: 50; background: #2c3e50; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 8px 18px; flex-wrap: wrap; gap: 6px; }
+  .timer-bar button { background: #e74c3c; border: none; color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 15px; }
+  .timer-bar button:hover { background: #c0392b; }
+  #timerDisplay { font-size: 20px; font-weight: bold; font-variant-numeric: tabular-nums; }
+  nav.tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 14px 16px; background: #e8eef7; position: sticky; top: 46px; z-index: 40; }
+  nav.tabs button { flex: 1 1 120px; padding: 10px 8px; border: none; border-radius: 10px; background: #fff; cursor: pointer; font-size: 14px; font-weight: 600; color: #34495e; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  nav.tabs button.active { background: #e74c3c; color: #fff; }
+  nav.tabs button.done::after { content: " ✓"; color: #27ae60; font-weight: bold; }
+  nav.tabs button.active.done::after { color: #fff; }
+  section.stage { display: none; max-width: 980px; margin: 22px auto; background: #fff; border-radius: 16px; padding: 26px; box-shadow: 0 4px 14px rgba(0,0,0,.07); }
+  section.stage.active { display: block; }
+  .stage-head { display: flex; align-items: baseline; gap: 12px; border-bottom: 3px solid #e74c3c; padding-bottom: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .stage-head .num { background: #e74c3c; color: #fff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+  .stage-head h2 { font-size: 21px; }
+  .mins { background: #f9e79f; color: #7d6608; padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: bold; }
+  .goal { background: #eafaf1; border-left: 4px solid #27ae60; padding: 10px 14px; border-radius: 0 8px 8px 0; margin-bottom: 16px; font-size: 14px; }
+  .zh { font-size: 1.35em; }
+  .py { color: #8a6d3b; font-size: .85em; font-style: italic; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin: 14px 0; }
+  .flip { perspective: 800px; height: 150px; cursor: pointer; }
+  .flip-inner { position: relative; width: 100%; height: 100%; transition: transform .5s; transform-style: preserve-3d; }
+  .flip.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; text-align: center; }
+  .flip-front { background: #fef9e7; border: 2px solid #f5deb3; }
+  .flip-back { background: #e8f6f3; border: 2px solid #a3d9c9; transform: rotateY(180deg); }
+  .flip-face .zh { font-size: 32px; font-weight: 700; }
+  .big-zh { font-size: 38px; font-weight: 700; }
+  .quiz-opt { display: block; width: 100%; text-align: left; padding: 12px 14px; margin: 8px 0; border: 2px solid #d5dbdb; border-radius: 10px; background: #fbfcfc; cursor: pointer; font-size: 16px; }
+  .quiz-opt:hover:not(:disabled) { border-color: #e74c3c; }
+  .quiz-opt.correct { background: #d5f5e3; border-color: #27ae60; }
+  .quiz-opt.wrong { background: #fadbd8; border-color: #c0392b; }
+  .feedback { min-height: 26px; font-weight: 600; margin: 8px 0; }
+  .feedback.ok { color: #27ae60; } .feedback.no { color: #c0392b; }
+  .btn { background: #2980b9; color: #fff; border: none; padding: 11px 18px; border-radius: 10px; cursor: pointer; font-size: 15px; margin: 6px 6px 6px 0; }
+  .btn:hover { background: #21618c; }
+  .btn.secondary { background: #7f8c8d; }
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+  @media (max-width: 640px) { .match-grid { grid-template-columns: 1fr; } }
+  .match-item { padding: 12px; border: 2px solid #d5dbdb; border-radius: 10px; cursor: pointer; text-align: center; background: #fff; font-size: 17px; }
+  .match-item.sel { border-color: #e74c3c; background: #fdecea; }
+  .match-item.ok { background: #d5f5e3; border-color: #27ae60; cursor: default; }
+  .match-item.bad { animation: shake .4s; background: #fadbd8; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  table.grocery { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  table.grocery th, table.grocery td { border: 1px solid #d5dbdb; padding: 8px 10px; text-align: center; font-size: 15px; }
+  table.grocery th { background: #eaf2f8; }
+  .dialogue { background: #f4ecf7; border-radius: 12px; padding: 16px; margin: 12px 0; }
+  .dialogue .line { margin: 8px 0; }
+  .dialogue .speaker { font-weight: bold; color: #8e44ad; }
+  .builder { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; min-height: 52px; padding: 10px; border: 2px dashed #a3d9c9; border-radius: 10px; background: #fbfefd; }
+  .chip { padding: 8px 12px; border-radius: 10px; background: #2980b9; color: #fff; cursor: pointer; font-size: 16px; }
+  .chip:hover { background: #21618c; }
+  .chip.in-sentence { background: #e67e22; }
+  .sentence { font-size: 22px; font-weight: 600; min-height: 36px; padding: 8px; }
+  .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+  .shop-item { border: 2px solid #d5dbdb; border-radius: 12px; padding: 12px; text-align: center; background: #fff; }
+  .shop-item .zh { font-size: 30px; }
+  .qty-ctrl { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 8px; }
+  .qty-ctrl button { width: 34px; height: 34px; border-radius: 50%; border: none; background: #e74c3c; color: #fff; font-size: 18px; cursor: pointer; }
+  .score { font-size: 18px; font-weight: bold; color: #8e44ad; }
+  .reflection label { display: block; margin: 10px 0; font-size: 16px; }
+  .reflection input[type="checkbox"] { width: 18px; height: 18px; margin-right: 8px; }
+  .final-score { text-align: center; font-size: 24px; font-weight: bold; color: #c0392b; margin: 14px 0; }
+  .hidden { display: none !important; }
+  .progress-note { color: #7f8c8d; font-size: 13px; margin-top: 14px; }
+  .tip { background: #fef9e7; border-left: 4px solid #f1c40f; padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 14px; }
+  @media print { nav.tabs, .timer-bar, .btn { display: none !important; } section.stage { display: block !important; page-break-after: always; box-shadow: none; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🛒 在商店买东西 · В магазине</h1>
+  <p>Интерактивный урок китайского языка · 90 минут · по материалам учебника (урок «Покупки»)</p>
+</header>
+
+<div class="timer-bar">
+  <span>⏱ Этап: <b id="stageTimer">–</b></span>
+  <span id="timerDisplay">90:00</span>
+  <span>
+    <button onclick="startGlobalTimer()">▶ Старт урока</button>
+    <button onclick="pauseTimer()">⏸ Пауза</button>
+    <button onclick="resetTimer()">↺ Сброс</button>
+  </span>
+</div>
+
+<nav class="tabs" id="tabs"></nav>
+
+<!-- ЭТАП 1 -->
+<section class="stage" id="s1">
+  <div class="stage-head"><div class="num">1</div><h2>Приветствие и цели урока</h2><span class="mins">5 минут</span></div>
+  <div class="goal">🎯 <b>Цель:</b> научиться говорить о покупках на китайском: спрашивать «Что ты покупаешь?», называть товары и количество (一瓶水, 两斤苹果), строить диалог в магазине.</div>
+  <div class="dialogue">
+    <p class="line"><span class="speaker">Приветствие:</span> <span class="zh">你好！上课了！</span> <span class="py">Nǐ hǎo! Shàngkè le!</span></p>
+    <p class="line">Сегодня суббота — идем в магазин! <span class="zh">今天是星期六。</span> <span class="py">Jīntiān shì xīngqīliù.</span></p>
+  </div>
+  <div class="tip">💡 Учитель: покажите картинку из учебника (мама и девочка с корзинами в магазине). Спросите по-русски: «Что они делают? Куда идут?» Затем объявите тему: <span class="zh">买东西</span> <span class="py">mǎi dōngxi</span> — «делать покупки».</div>
+  <div class="tip">📋 <b>План урока</b> (напомните ученикам): ① цели → ② разминка → ③ 9 новых слов → ④ иероглифы и пиньинь → ⑤ счётные слова → ⑥ диалог → ⑦ игра «Магазин» → ⑧ тест → ⑨ рефлексия.</div>
+  <button class="btn" onclick="markDone(1); showStage(2);">Далее → Разминка</button>
+</section>
+
+<!-- ЭТАП 2 -->
+<section class="stage" id="s2">
+  <div class="stage-head"><div class="num">2</div><h2>Разминка: угадай слово по картинке 🖼</h2><span class="mins">7 минут</span></div>
+  <div class="goal">🎯 Вспомните пройденное и подготовьтесь к новой лексике.</div>
+  <p>Что вы видите на полках магазина? Выберите правильное слово. Эмодзи заменяют картинки из учебника:</p>
+  <div id="warmupQuiz"></div>
+  <button class="btn hidden" id="warmupNext" onclick="markDone(2); showStage(3);">Далее → Новые слова</button>
+  <div class="progress-note">Разминка идёт устно + в парах: ученики называют по-русски, что видят на картинке учебника (с. 30).</div>
+</section>
+
+<!-- ЭТАП 3 -->
+<section class="stage" id="s3">
+  <div class="stage-head"><div class="num">3</div><h2>Новые слова 生词 · 9 слов</h2><span class="mins">15 минут</span></div>
+  <div class="goal">🎯 Выучить 9 слов: 买, 水, 点心, 还, 斤, 瓶, 和, 要, 东西. Нажмите на карточку, чтобы перевернуть.</div>
+  <div class="card-grid" id="flashcards"></div>
+  <h3 style="margin-top:18px;">Проверь себя: какое слово пропущено?</h3>
+  <div id="vocabQuiz"></div>
+  <button class="btn hidden" id="vocabNext" onclick="markDone(3); showStage(4);">Далее → Иероглифы и пиньинь</button>
+  <div class="progress-note">Порядок работы: 1) все открывают карточки и повторяют за учителем 2 раза; 2) работа в парах — один показывает иероглиф, второй переводит; 3) мини-тест ниже.</div>
+</section>
+
+<!-- ЭТАП 4 -->
+<section class="stage" id="s4">
+  <div class="stage-head"><div class="num">4</div><h2>Соедини: иероглиф — пиньинь — перевод 🔗</h2><span class="mins">10 минут</span></div>
+  <div class="goal">🎯 Научиться читать новые слова с пиньинем и узнавать их в тексте.</div>
+  <p>Нажмите сначала на иероглиф (слева), потом на его пиньинь (справа). Пары засчитываются автоматически.</p>
+  <div class="match-grid">
+    <div id="matchLeft"></div>
+    <div id="matchRight"></div>
+  </div>
+  <p id="matchScore" class="score"></p>
+  <button class="btn hidden" id="matchNext" onclick="markDone(4); showStage(5);">Далее → Счётные слова</button>
+</section>
+
+<!-- ЭТАП 5 -->
+<section class="stage" id="s5">
+  <div class="stage-head"><div class="num">5</div><h2>Счётные слова: 瓶, 斤, 个 + числительные</h2><span class="mins">12 минут</span></div>
+  <div class="goal">🎯 Употреблять счётные слова: 一瓶水 (одна бутылка воды), 两瓶牛奶 (две бутылки молока), 三斤点心 (3 цзинь ≈ 1,5 кг выпечки), 六个鸡蛋 (6 яиц).</div>
+  <table class="grocery">
+    <tr><th>Счётное слово</th><th>Пиньинь</th><th>Значение</th><th>Пример из учебника</th></tr>
+    <tr><td class="zh">瓶</td><td>píng</td><td>бутылка (для жидкостей)</td><td class="zh">一瓶水 · 两瓶牛奶 · 五瓶水</td></tr>
+    <tr><td class="zh">斤</td><td>jīn</td><td>мера веса = 500 г</td><td class="zh">一斤点心 · 两斤苹果</td></tr>
+    <tr><td class="zh">个</td><td>ge</td><td>универсальное (штуки)</td><td class="zh">六个鸡蛋</td></tr>
+  </table>
+  <div class="tip">⚠️ Числительное «два» перед счётным словом — <b>两 liǎng</b>, а не 二: <span class="zh">两斤苹果</span> ✔ (не 二斤).</div>
+  <h3>Упражнение: выберите правильное счётное слово</h3>
+  <div id="measureQuiz"></div>
+  <button class="btn hidden" id="measureNext" onclick="markDone(5); showStage(6);">Далее → Диалог</button>
+</section>
+
+<!-- ЭТАП 6 -->
+<section class="stage" id="s6">
+  <div class="stage-head"><div class="num">6</div><h2>Диалог в магазине 🗣</h2><span class="mins">15 минут</span></div>
+  <div class="goal">🎯 Прочитать и разыграть диалог из учебника (с. 31, упр. 1 и 4).</div>
+  <div class="dialogue">
+    <p class="line"><span class="speaker">A:</span> <span class="zh">你买什么？</span> <span class="py">Nǐ mǎi shénme?</span> — Что ты покупаешь?</p>
+    <p class="line"><span class="speaker">B:</span> <span class="zh">我买点心。</span> <span class="py">Wǒ mǎi diǎnxin.</span> — Я покупаю выпечку.</p>
+    <p class="line"><span class="speaker">A:</span> <span class="zh">你买几斤？</span> <span class="py">Nǐ mǎi jǐ jīn?</span> — Сколько цзиней покупаешь?</p>
+    <p class="line"><span class="speaker">B:</span> <span class="zh">我买一斤。</span> <span class="py">Wǒ mǎi yì jīn.</span> — Покупаю один цзинь.</p>
+    <p class="line"><span class="speaker">A:</span> <span class="zh">你还要什么？</span> <span class="py">Nǐ hái yào shénme?</span> — Что ещё тебе нужно?</p>
+    <p class="line"><span class="speaker">B:</span> <span class="zh">我还要一瓶水和两瓶牛奶。</span> <span class="py">Wǒ hái yào yì píng shuǐ hé liǎng píng niúnǎi.</span> — Мне ещё нужны бутылка воды и две бутылки молока.</p>
+  </div>
+  <h3>Конструктор фразы: составь предложение</h3>
+  <p>Нажимайте на слова в нужном порядке, чтобы составить: «Мне ещё нужны две бутылки молока». Проверьте себя по образцу выше.</p>
+  <div class="builder" id="chips"></div>
+  <div class="sentence" id="sentenceDisplay"></div>
+  <div class="feedback" id="sentenceFeedback"></div>
+  <button class="btn" onclick="checkSentence()">Проверить</button>
+  <button class="btn secondary" onclick="resetSentence()">Сбросить</button>
+  <div class="tip">🎭 <b>Ролевая игра (в парах, 5 мин):</b> один — продавец (A), второй — покупатель (B). B берёт 2–3 товара из новых слов и заменяет 点心, 水, 牛奶 на свои. Затем меняются ролями. Образец монолога из учебника (с. 31, синий прямоугольник): <span class="zh">今天是星期六，我要买很多东西。我要买五瓶水、三瓶牛奶，还要买六个鸡蛋、两斤苹果和一斤点心。</span></div>
+  <button class="btn" onclick="markDone(6); showStage(7);">Далее → Игра «Магазин»</button>
+</section>
+
+<!-- ЭТАП 7 -->
+<section class="stage" id="s7">
+  <div class="stage-head"><div class="num">7</div><h2>Игра «Магазин» 🛍</h2><span class="mins">12 минут</span></div>
+  <div class="goal">🎯 Выполнить задание «我要买…»: наберите корзину на сумму ровно 20 元 и озвучьте её предложением 我要买…… и 还要……</div>
+  <p>Соберите корзину. Стоимость товаров: <b>水 1元 · 汽水 2元 · 牛奶 3元 · 苹果 4元 · 点心 5元 · 鸡蛋 6元 · 牛肉 7元 · 面条 8元</b>. Сумма должна быть ровно <b>20元</b>!</p>
+  <div class="shop-grid" id="shop"></div>
+  <p class="score">Сумма корзины: <span id="basketTotal">0</span> 元</p>
+  <div class="feedback" id="basketFeedback"></div>
+  <button class="btn" onclick="checkBasket()">Проверить корзину</button>
+  <button class="btn secondary" onclick="resetBasket()">Очистить</button>
+  <div class="tip">🏆 Команда/ученик, набравшие ровно 20元, произносят корзину по-китайски: <span class="zh">我要买……，还要买……。</span> Например: 我要买一瓶水、两斤苹果，还要买三斤点心。</div>
+  <button class="btn hidden" id="shopNext" onclick="markDone(7); showStage(8);">Далее → Итоговый тест</button>
+</section>
+
+<!-- ЭТАП 8 -->
+<section class="stage" id="s8">
+  <div class="stage-head"><div class="num">8</div><h2>Итоговый тест 📝</h2><span class="mins">10 минут</span></div>
+  <div class="goal">🎯 Проверить себя: лексика, диалог, счётные слова. 8 вопросов, критерий «5» — 6+ правильных ответов.</div>
+  <div id="finalQuiz"></div>
+  <div class="final-score hidden" id="finalScore"></div>
+  <button class="btn hidden" id="finalNext" onclick="markDone(8); showStage(9);">Далее → Рефлексия</button>
+</section>
+
+<!-- ЭТАП 9 -->
+<section class="stage" id="s9">
+  <div class="stage-head"><div class="num">9</div><h2>Рефлексия и домашнее задание 🏠</h2><span class="mins">4 минуты</span></div>
+  <div class="goal">🎯 Оценить свою работу, задать домашнее задание.</div>
+  <div class="reflection">
+    <label><input type="checkbox"> Я могу назвать 5+ товаров по-китайски (水, 牛奶, 点心, 苹果, 鸡蛋…)</label>
+    <label><input type="checkbox"> Я помню счётные слова: 瓶, 斤, 个</label>
+    <label><input type="checkbox"> Я могу спросить 你买什么？ и ответить 我买点心。</label>
+    <label><input type="checkbox"> Я могу сказать, что мне «ещё нужно»: 我还要一瓶水。</label>
+  </div>
+  <div class="tip">📖 <b>Домашнее задание:</b> 1) выучить 9 слов с пиньинем (с. 30, New Words); 2) выучить диалог наизусть и разыграть с родителем; 3) по образцу текста с. 31 написать свой список покупок из 4 товаров с числительными (например: 我要买一斤牛肉、两瓶汽水、六个鸡蛋和两斤面条).</div>
+  <div class="tip">🗣 Прощание: <span class="zh">下课！再见！</span> <span class="py">Xiàkè! Zàijiàn!</span></div>
+  <button class="btn" onclick="markDone(9);">Завершить урок ✔</button>
+</section>
+
+<script>
+/* ===== Данные ===== */
+const words = [
+  {zh:"买", py:"mǎi", ru:"покупать", ex:"买东西"},
+  {zh:"水", py:"shuǐ", ru:"вода", ex:"一瓶水"},
+  {zh:"点心", py:"diǎnxin", ru:"выпечка, сладости", ex:"三斤点心"},
+  {zh:"还", py:"hái", ru:"ещё, кроме того", ex:"还要"},
+  {zh:"斤", py:"jīn", ru:"мера веса (500 г)", ex:"两斤苹果"},
+  {zh:"瓶", py:"píng", ru:"бутылка", ex:"五瓶水"},
+  {zh:"和", py:"hé", ru:"и", ex:"水果和点心"},
+  {zh:"要", py:"yào", ru:"хотеть, нужно", ex:"我要买"},
+  {zh:"东西", py:"dōngxi", ru:"вещь, вещи", ex:"很多东西"}
+];
+const stageMins = {1:5,2:7,3:15,4:10,5:12,6:15,7:12,8:10,9:4};
+
+/* ===== Таймеры ===== */
+let globalLeft = 90*60, stageLeft = stageMins[1]*60, timerId = null;
+function fmt(s){ const m=Math.floor(s/60), ss=s%60; return String(m).padStart(2,'0')+":"+String(ss).padStart(2,'0'); }
+function tick(){
+  if(globalLeft>0) globalLeft--;
+  if(stageLeft>0) stageLeft--;
+  document.getElementById('timerDisplay').textContent = fmt(globalLeft);
+  document.getElementById('stageTimer').textContent = fmt(stageLeft);
+  if(globalLeft===0){ pauseTimer(); alert("⏰ Урок окончен!"); }
+}
+function startGlobalTimer(){ if(!timerId){ timerId=setInterval(tick,1000); } }
+function pauseTimer(){ clearInterval(timerId); timerId=null; }
+function resetTimer(){ pauseTimer(); globalLeft=90*60; stageLeft=stageMins[current]*60; document.getElementById('timerDisplay').textContent=fmt(globalLeft); document.getElementById('stageTimer').textContent=fmt(stageLeft); }
+
+/* ===== Навигация ===== */
+let current = 1;
+const stageNames = {1:"Старт",2:"Разминка",3:"Слова",4:"Иероглифы",5:"Счётные слова",6:"Диалог",7:"Магазин",8:"Тест",9:"Итог"};
+function buildTabs(){
+  const nav = document.getElementById('tabs'); nav.innerHTML='';
+  for(let i=1;i<=9;i++){
+    const b=document.createElement('button');
+    b.textContent = i+". "+stageNames[i];
+    b.id="tab"+i;
+    b.onclick=()=>showStage(i);
+    nav.appendChild(b);
+  }
+}
+function showStage(n){
+  current=n;
+  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab'+n).classList.add('active');
+  stageLeft = stageMins[n]*60;
+  document.getElementById('stageTimer').textContent = fmt(stageLeft);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function markDone(n){ document.getElementById('tab'+n).classList.add('done'); }
+
+/* ===== Этап 2: разминка ===== */
+const warmup = [
+  {emoji:"💧", ru:"вода", zh:"水", py:"shuǐ"},
+  {emoji:"🥛", ru:"молоко", zh:"牛奶", py:"niúnǎi"},
+  {emoji:"🍰", ru:"выпечка", zh:"点心", py:"diǎnxin"},
+  {emoji:"🍎", ru:"яблоко", zh:"苹果", py:"píngguǒ"},
+  {emoji:"🥚", ru:"яйцо", zh:"鸡蛋", py:"jīdàn"},
+  {emoji:"🍜", ru:"лапша", zh:"面条", py:"miàntiáo"}
+];
+let warmIdx=0, warmCorrect=0;
+function renderWarmup(){
+  const box=document.getElementById('warmupQuiz');
+  if(warmIdx>=warmup.length){
+    box.innerHTML = `<p class="score">Разминка: ${warmCorrect}/${warmup.length} ✔</p><p>Молодцы! Теперь учим слова по-настоящему.</p>`;
+    document.getElementById('warmupNext').classList.remove('hidden');
+    return;
+  }
+  const item=warmup[warmIdx];
+  const opts=[item.ru];
+  while(opts.length<4){ const r=warmup[Math.floor(Math.random()*warmup.length)].ru; if(!opts.includes(r)) opts.push(r); }
+  opts.sort(()=>Math.random()-.5);
+  box.innerHTML = `<p style="font-size:60px;text-align:center;margin:10px">${item.emoji}</p>
+    <p style="text-align:center">Как это по-русски? <span class="zh">${item.zh}</span> <span class="py">${item.py}</span></p>` +
+    opts.map(o=>`<button class="quiz-opt" onclick="answerWarmup(this,'${o.replace(/'/g,"\\'")}')">${o}</button>`).join('');
+}
+function answerWarmup(btn, ans){
+  const item=warmup[warmIdx];
+  const all=document.querySelectorAll('#warmupQuiz .quiz-opt');
+  all.forEach(b=>b.disabled=true);
+  if(ans===item.ru){ btn.classList.add('correct'); warmCorrect++; }
+  else { btn.classList.add('wrong'); all.forEach(b=>{ if(b.textContent===item.ru) b.classList.add('correct'); }); }
+  warmIdx++;
+  setTimeout(renderWarmup, 1000);
+}
+
+/* ===== Этап 3: карточки + мини-тест ===== */
+function renderFlashcards(){
+  const g=document.getElementById('flashcards'); g.innerHTML='';
+  words.forEach(w=>{
+    const d=document.createElement('div'); d.className='flip';
+    d.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front"><div class="zh">${w.zh}</div><div class="py">${w.py}</div></div>
+      <div class="flip-face flip-back"><div style="font-size:17px;font-weight:600">${w.ru}</div><div class="py" style="margin-top:6px">${w.ex}</div></div>
+    </div>`;
+    d.onclick=()=>d.classList.toggle('flipped');
+    g.appendChild(d);
+  });
+}
+const vocabTest = [
+  {q:"«Покупать» по-китайски:", opts:["要 yào","买 mǎi","还 hái","和 hé"], a:1},
+  {q:"«Ещё, кроме того» — это:", opts:["水 shuǐ","东西 dōngxi","还 hái","瓶 píng"], a:2},
+  {q:"«Выпечка, сладости» — это:", opts:["点心 diǎnxin","牛奶 niúnǎi","斤 jīn","买 mǎi"], a:0},
+  {q:"«Бутылка» (счётное слово) — это:", opts:["个 ge","斤 jīn","和 hé","瓶 píng"], a:3},
+  {q:"«Вещи» — это:", opts:["要 yào","东西 dōngxi","水 shuǐ","还 hái"], a:1},
+  {q:"«Хотеть, нужно» — это:", opts:["和 hé","买 mǎi","要 yào","瓶 píng"], a:2}
+];
+let vIdx=0, vScore=0;
+function renderVocabQuiz(){
+  const box=document.getElementById('vocabQuiz');
+  if(vIdx>=vocabTest.length){
+    box.innerHTML = `<p class="score">Мини-тест: ${vScore}/${vocabTest.length}</p>`;
+    document.getElementById('vocabNext').classList.remove('hidden');
+    return;
+  }
+  const t=vocabTest[vIdx];
+  box.innerHTML = `<p style="font-size:17px;margin:8px 0"><b>${vIdx+1}/${vocabTest.length}.</b> ${t.q}</p>` +
+    t.opts.map((o,i)=>`<button class="quiz-opt" onclick="answerVocab(this,${i})">${o}</button>`).join('');
+}
+function answerVocab(btn,i){
+  const t=vocabTest[vIdx];
+  document.querySelectorAll('#vocabQuiz .quiz-opt').forEach(b=>b.disabled=true);
+  if(i===t.a){ btn.classList.add('correct'); vScore++; }
+  else { btn.classList.add('wrong'); document.querySelectorAll('#vocabQuiz .quiz-opt')[t.a].classList.add('correct'); }
+  vIdx++;
+  setTimeout(renderVocabQuiz, 900);
+}
+
+/* ===== Этап 4: соотнесение ===== */
+const matchSet = [
+  {zh:"买", py:"mǎi"}, {zh:"水", py:"shuǐ"}, {zh:"点心", py:"diǎnxin"},
+  {zh:"还", py:"hái"}, {zh:"斤", py:"jīn"}, {zh:"瓶", py:"píng"}, {zh:"和", py:"hé"}, {zh:"要", py:"yào"}, {zh:"东西", py:"dōngxi"}
+];
+let selLeft=null, selRight=null, matched=0;
+function renderMatch(){
+  matched=0; selLeft=null; selRight=null;
+  const L=document.getElementById('matchLeft'), R=document.getElementById('matchRight');
+  L.style.display=R.style.display="grid"; L.style.gap=R.style.gap="8px";
+  const shuffled=[...matchSet].sort(()=>Math.random()-.5);
+  L.innerHTML = shuffled.map((m,i)=>`<div class="match-item" data-py="${m.py}" onclick="pick(this,'L')"><span class="zh">${m.zh}</span></div>`).join('');
+  R.innerHTML = [...matchSet].sort(()=>Math.random()-.5).map(m=>`<div class="match-item" data-py="${m.py}" onclick="pick(this,'R')"><span class="py" style="font-size:17px;font-style:normal;font-weight:600;color:#2980b9">${m.py}</span></div>`).join('');
+  document.getElementById('matchScore').textContent = "";
+}
+function pick(el, side){
+  if(el.classList.contains('ok')) return;
+  const group = side==='L' ? '#matchLeft .match-item' : '#matchRight .match-item';
+  document.querySelectorAll(group).forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  if(side==='L') selLeft=el; else selRight=el;
+  if(selLeft && selRight){
+    if(selLeft.dataset.py===selRight.dataset.py){
+      selLeft.classList.remove('sel'); selRight.classList.remove('sel');
+      selLeft.classList.add('ok'); selRight.classList.add('ok');
+      matched++;
+      document.getElementById('matchScore').textContent = `Совпадений: ${matched}/9`;
+      if(matched===9){ document.getElementById('matchScore').textContent = "Отлично! Все 9 пар найдены ✔"; document.getElementById('matchNext').classList.remove('hidden'); }
+    } else {
+      selLeft.classList.add('bad'); selRight.classList.add('bad');
+      const a=selLeft,b=selRight;
+      setTimeout(()=>{a.classList.remove('sel','bad'); b.classList.remove('sel','bad');},450);
+    }
+    selLeft=null; selRight=null;
+  }
+}
+
+/* ===== Этап 5: счётные слова ===== */
+const measureTest = [
+  {q:"一 ___ 水 (одна бутылка воды)", opts:["瓶","斤","个"], a:0},
+  {q:"两 ___ 牛奶 (две бутылки молока)", opts:["斤","瓶","个"], a:1},
+  {q:"三 ___ 点心 (три цзиня выпечки)", opts:["个","瓶","斤"], a:2},
+  {q:"六 ___ 鸡蛋 (шесть яиц)", opts:["个","瓶","斤"], a:0},
+  {q:"四 ___ 苹果 (четыре цзиня яблок)", opts:["个","斤","瓶"], a:1},
+  {q:"五 ___ 水 (пять бутылок воды)", opts:["个","斤","瓶"], a:2}
+];
+let mIdx=0, mScore=0;
+function renderMeasureQuiz(){
+  const box=document.getElementById('measureQuiz');
+  if(mIdx>=measureTest.length){
+    box.innerHTML = `<p class="score">Результат: ${mScore}/${measureTest.length}</p>`;
+    document.getElementById('measureNext').classList.remove('hidden');
+    return;
+  }
+  const t=measureTest[mIdx];
+  box.innerHTML = `<p style="font-size:18px;margin:8px 0"><b>${mIdx+1}/${measureTest.length}.</b> <span class="zh">${t.q}</span></p>` +
+    t.opts.map((o,i)=>`<button class="quiz-opt" onclick="answerMeasure(this,${i})" style="width:auto;display:inline-block;margin-right:10px"><span class="zh">${o}</span></button>`).join('');
+}
+function answerMeasure(btn,i){
+  const t=measureTest[mIdx];
+  document.querySelectorAll('#measureQuiz .quiz-opt').forEach(b=>b.disabled=true);
+  if(i===t.a){ btn.classList.add('correct'); mScore++; }
+  else { btn.classList.add('wrong'); document.querySelectorAll('#measureQuiz .quiz-opt')[t.a].classList.add('correct'); }
+  mIdx++;
+  setTimeout(renderMeasureQuiz, 900);
+}
+
+/* ===== Этап 6: конструктор ===== */
+const target = ["我","还","要","两","瓶","牛奶"];
+let picked = [];
+function renderChips(){
+  const box=document.getElementById('chips');
+  box.innerHTML='';
+  [...target].sort(()=>Math.random()-.5).forEach(w=>{
+    const c=document.createElement('span'); c.className='chip'; c.textContent=w;
+    c.onclick=()=>{ picked.push(w); renderSentence(); c.remove(); };
+    box.appendChild(c);
+  });
+  picked=[]; renderSentence();
+  document.getElementById('sentenceFeedback').textContent='';
+}
+function renderSentence(){
+  document.getElementById('sentenceDisplay').textContent = picked.join('　') || '……';
+}
+function checkSentence(){
+  const fb=document.getElementById('sentenceFeedback');
+  if(picked.join('')===target.join('')){ fb.textContent="✔ Верно! 我还要两瓶牛奶。 — «Мне ещё нужны две бутылки молока»"; fb.className='feedback ok'; }
+  else { fb.textContent="✘ Пока не так. Подсказка: я → ещё → нужно → два → бутылки → молоко."; fb.className='feedback no'; }
+}
+function resetSentence(){ renderChips(); }
+
+/* ===== Этап 7: магазин ===== */
+const goods = [
+  {zh:"水", py:"shuǐ", price:1, mw:"瓶"}, {zh:"汽水", py:"qìshuǐ", price:2, mw:"瓶"},
+  {zh:"牛奶", py:"niúnǎi", price:3, mw:"瓶"}, {zh:"苹果", py:"píngguǒ", price:4, mw:"斤"},
+  {zh:"点心", py:"diǎnxin", price:5, mw:"斤"}, {zh:"鸡蛋", py:"jīdàn", price:6, mw:"个"},
+  {zh:"牛肉", py:"niúròu", price:7, mw:"斤"}, {zh:"面条", py:"miàntiáo", price:8, mw:"斤"}
+];
+const basket = {};
+function renderShop(){
+  const g=document.getElementById('shop'); g.innerHTML='';
+  goods.forEach((it,i)=>{
+    basket[i]=basket[i]||0;
+    const d=document.createElement('div'); d.className='shop-item';
+    d.innerHTML = `<div class="zh">${it.zh}</div><div class="py">${it.py} · ${it.price}元 · ${it.mw}</div>
+      <div class="qty-ctrl"><button onclick="changeQty(${i},-1)">−</button><b id="qty${i}">0</b><button onclick="changeQty(${i},1)">+</button></div>`;
+    g.appendChild(d);
+  });
+}
+function changeQty(i,d){ basket[i]=Math.max(0,(basket[i]||0)+d); document.getElementById('qty'+i).textContent=basket[i]; updateTotal(); }
+function updateTotal(){
+  let t=0; goods.forEach((it,i)=>t+=it.price*(basket[i]||0));
+  document.getElementById('basketTotal').textContent=t;
+}
+function checkBasket(){
+  let t=0; goods.forEach((it,i)=>t+=it.price*(basket[i]||0));
+  const fb=document.getElementById('basketFeedback');
+  if(t===20){
+    let parts=[]; goods.forEach((it,i)=>{ const q=basket[i]||0; if(q>0){
+      const nums=["","一","两","三","四","五","六","七","八","九","十"];
+      parts.push(`${nums[q]}${it.mw}${it.zh}`);
+    }});
+    fb.innerHTML = "✔ Идеально, ровно 20元! Скажите по-китайски:<br><span class='zh'>我要买" + parts.join("、") + "。</span>";
+    fb.className='feedback ok';
+    document.getElementById('shopNext').classList.remove('hidden');
+  } else if(t<20){ fb.textContent=`✘ Пока ${t}元 — нужно ещё ${20-t}元.`; fb.className='feedback no'; }
+  else { fb.textContent=`✘ Уже ${t}元 — перебор на ${t-20}元. Уберите что-то.`; fb.className='feedback no'; }
+}
+function resetBasket(){ goods.forEach((_,i)=>basket[i]=0); renderShop(); updateTotal(); document.getElementById('basketFeedback').textContent=''; }
+
+/* ===== Этап 8: итоговый тест ===== */
+const finalTest = [
+  {q:"Что значит 你买什么？", opts:["Что ты хочешь?","Что ты покупаешь?","Сколько стоит?","Что это?"], a:1},
+  {q:"Что значит 我买点心？", opts:["Я покупаю воду","Я продаю выпечку","Я покупаю выпечку","Я хочу яблоки"], a:2},
+  {q:"Как сказать «две бутылки молока»?", opts:["二瓶牛奶","两瓶牛奶","两个牛奶","两斤牛奶"], a:1},
+  {q:"你买几斤？ — правильный ответ «покупаю один цзинь»:", opts:["我买一斤。","我买一瓶。","我买两个。","我还买。"], a:0},
+  {q:"«Мне ещё нужна вода» — это:", opts:["我要水。","我还要水。","我买水。","我还有水。"], a:1},
+  {q:"六个鸡蛋 — это:", opts:["6 бутылок яиц","6 цзиней яиц","6 яиц","2 цзиня яиц"], a:2},
+  {q:"Выберите верное предложение:", opts:["今天星期六我是。","我是今天星期六。","今天是星期六，我要买很多东西。","我要很多买东西是今天。"], a:2},
+  {q:"和 значит:", opts:["или","и","но","ещё"], a:1}
+];
+let fIdx=0, fScore=0;
+function renderFinal(){
+  const box=document.getElementById('finalQuiz');
+  if(fIdx>=finalTest.length){
+    box.innerHTML='';
+    const s=document.getElementById('finalScore');
+    s.classList.remove('hidden');
+    s.textContent = `Результат: ${fScore}/8`;
+    document.getElementById('finalScore').insertAdjacentHTML('afterend',
+      `<p style="text-align:center">${fScore>=6?"🏆 Отличный результат — тема усвоена!":fScore>=4?"👍 Хорошо, но повторите карточки ещё раз.":"📚 Стоит повторить слова и диалог."}</p>`);
+    document.getElementById('finalNext').classList.remove('hidden');
+    return;
+  }
+  const t=finalTest[fIdx];
+  box.innerHTML = `<p style="font-size:17px;margin:8px 0"><b>${fIdx+1}/${finalTest.length}.</b> ${t.q}</p>` +
+    t.opts.map((o,i)=>`<button class="quiz-opt" onclick="answerFinal(this,${i})">${o}</button>`).join('');
+}
+function answerFinal(btn,i){
+  const t=finalTest[fIdx];
+  document.querySelectorAll('#finalQuiz .quiz-opt').forEach(b=>b.disabled=true);
+  if(i===t.a){ btn.classList.add('correct'); fScore++; }
+  else { btn.classList.add('wrong'); document.querySelectorAll('#finalQuiz .quiz-opt')[t.a].classList.add('correct'); }
+  fIdx++;
+  setTimeout(renderFinal, 900);
+}
+
+/* ===== Инициализация ===== */
+buildTabs();
+renderFlashcards(); renderWarmup(); renderVocabQuiz(); renderMatch();
+renderMeasureQuiz(); renderChips(); renderShop(); renderFinal();
+showStage(1);
+</script>
+</body>
+</html>
